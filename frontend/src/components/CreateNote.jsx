@@ -20,12 +20,14 @@ export default class CreateNote extends Component {
       users: res.data.map(user => user.username),
       userSelected: res.data[0].username
     })
-    const userId  = this.props.params.id;
-    console.log(userId)
+    const userId  = this.props.params.id; // remplazar con la id si no se soluciono
     if (userId) {
       const res = await axios.get('http://localhost:4000/api/notes/' + userId);
-      console.log(res.data)
         this.setState({
+          title: res.data.title,
+          content: res.data.content, 
+          date: new Date(res.data.date),
+          userSelected: res.data.author,
           editing: true,
           _id: userId
         })
@@ -54,7 +56,7 @@ export default class CreateNote extends Component {
   }
 
   onChangeDate = date => {
-    this.setState({date});
+    this.setState({date: date});
   }
 
   render() {
@@ -69,6 +71,7 @@ export default class CreateNote extends Component {
                 className='form-control'
                 name='userSelected'
                 onChange={this.onInputChange}
+                value= {this.state.userSelected}
               >
                 {
                   this.state.users.map(user => 
@@ -86,6 +89,7 @@ export default class CreateNote extends Component {
                 placeholder='Title' 
                 name='title' 
                 onChange={this.onInputChange}
+                value= {this.state.title}
                 required
               />
             </div>
@@ -96,6 +100,7 @@ export default class CreateNote extends Component {
                   className='form-control'
                   placeholder='Content'
                   onChange={this.onInputChange}
+                  value= {this.state.content}
                   required
                 >
 
