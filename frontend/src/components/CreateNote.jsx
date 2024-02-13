@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { useParams } from 'react-router-dom'
 
 export default class CreateNote extends Component {
   
@@ -14,29 +13,33 @@ export default class CreateNote extends Component {
     date: new Date()
   }
 
-  async componentDidMount() {
-    const res = await axios.get('http://localhost:4000/api/users')
+  componentDidMount = async () => {
+    const res = await axios.get('http://localhost:4000/api/users');
     this.setState({
       users: res.data.map(user => user.username),
       userSelected: res.data[0].username
-    })
-    const userId  = this.props.params.id; // remplazar con la id si no se soluciono
-    if (userId) {
-      const res = await axios.get('http://localhost:4000/api/notes/' + userId);
+    });
+    if (this.props && this.props.params) {
+      const idNote = this.props.params.id;
+      if (idNote) {
+        const res = await axios.get("http://localhost:4000/api/notes/" + idNote);
+        // console.log(res.data);
         this.setState({
           title: res.data.title,
-          content: res.data.content, 
+          content: res.data.content,
           date: new Date(res.data.date),
           userSelected: res.data.author,
           editing: true,
-          _id: userId
-        })
+          _id: this.props.params.id
+        });
+      }
     }
   }
+
   onSubmit = async (e) => {
     e.preventDefault();
     const newNote = {
-      title:this.state.title,
+      title: this.state.title,
       content: this.state.content,
       date: this.state.date,
       author: this.state.userSelected
@@ -46,9 +49,9 @@ export default class CreateNote extends Component {
     } else {
       await axios.post('http://localhost:4000/api/notes', newNote);
     }
-    window.location.href = '/';
+    window.location.href = '/'    
   }
-  
+
   onInputChange = e => {
     this.setState({
       [e.target.name]: e.target.value
@@ -56,7 +59,9 @@ export default class CreateNote extends Component {
   }
 
   onChangeDate = date => {
-    this.setState({date: date});
+    this.setState({
+      date
+    })
   }
 
   render() {
